@@ -134,6 +134,7 @@ export default function StreamingQueue() {
                 className="bg-success text-white hover:bg-green-600"
                 onClick={() => startStreamMutation.mutate()}
                 disabled={startStreamMutation.isPending || queue.length === 0}
+                title="Stream will continue running even if you close the browser"
               >
                 <Play className="mr-2" size={16} />
                 Start Streaming
@@ -155,6 +156,9 @@ export default function StreamingQueue() {
                       <p className="font-medium text-gray-900">{currentVideo.video.originalName}</p>
                       <p className="text-sm text-secondary">
                         Currently streaming • Duration: {formatDuration(currentVideo.video.duration || 0)}
+                      </p>
+                      <p className="text-xs text-success font-medium">
+                        📺 Server-side stream (continues when browser closes)
                       </p>
                     </div>
                   </div>

@@ -27,7 +27,7 @@ export default function Dashboard() {
         case "stream_started":
           toast({
             title: "Stream Started",
-            description: "Your video is now streaming live to Facebook.",
+            description: "Your video is now streaming live to Facebook. Stream will continue even if you close the browser.",
           });
           break;
         case "stream_stopped":

@@ -213,6 +213,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const config = await storage.getConfiguration();
       
       // Start FFmpeg stream
+      console.log(`🚀 Starting stream for: ${video.originalName}`);
+      console.log(`📺 Stream will continue running even if you close the browser`);
+      
       await ffmpegService.startStream({
         inputFile: video.filename,
         rtmpUrl: liveVideo.stream_url,
@@ -250,6 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Stop FFmpeg
+      console.log(`⏹️ Stopping stream...`);
       await ffmpegService.stopStream();
 
       // Update session
@@ -273,10 +277,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentSession = await storage.getCurrentSession();
       const isStreaming = ffmpegService.getStreamingStatus();
+      const currentStreamInfo = ffmpegService.getCurrentStreamInfo();
+      const processAlive = ffmpegService.isProcessAlive();
       
       res.json({
         isStreaming,
-        session: currentSession
+        session: currentSession,
+        streamInfo: currentStreamInfo,
+        processAlive,
+        serverSideStream: true // Indicates this runs server-side
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to get stream status" });

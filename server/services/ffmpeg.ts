@@ -12,6 +12,7 @@ export interface StreamingOptions {
 export class FFmpegService {
   private streamingProcess: ChildProcess | null = null;
   private isStreaming = false;
+  private currentStreamInfo: StreamingOptions | null = null;
 
   async startStream(options: StreamingOptions): Promise<boolean> {
     if (this.isStreaming) {
@@ -67,6 +68,9 @@ export class FFmpegService {
       setTimeout(() => {
         if (this.streamingProcess && !this.streamingProcess.killed) {
           this.isStreaming = true;
+          this.currentStreamInfo = options;
+          console.log(`✅ Stream started successfully: ${options.inputFile}`);
+          console.log(`📺 Streaming will continue even if browser is closed`);
           resolve(true);
         } else {
           reject(new Error("Failed to start FFmpeg process"));
@@ -82,8 +86,10 @@ export class FFmpegService {
 
     return new Promise((resolve) => {
       this.streamingProcess!.on("close", () => {
+        console.log(`⏹️ Stream ended: ${this.currentStreamInfo?.inputFile || 'unknown'}`);
         this.isStreaming = false;
         this.streamingProcess = null;
+        this.currentStreamInfo = null;
         resolve(true);
       });
 
@@ -101,6 +107,15 @@ export class FFmpegService {
 
   getStreamingStatus(): boolean {
     return this.isStreaming;
+  }
+
+  getCurrentStreamInfo(): StreamingOptions | null {
+    return this.currentStreamInfo;
+  }
+
+  // Check if the process is actually running (in case of unexpected termination)
+  isProcessAlive(): boolean {
+    return this.streamingProcess !== null && !this.streamingProcess.killed;
   }
 
   async getVideoInfo(filePath: string): Promise<{ duration: number; size: number }> {

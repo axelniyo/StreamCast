@@ -63,20 +63,20 @@ export default function SystemStatus() {
     {
       id: 1,
       type: "success",
-      message: "Stream started successfully",
+      message: "Server-side streaming active",
       timestamp: "2 minutes ago",
     },
     {
       id: 2,
-      type: "warning",
-      message: "Network latency spike detected",
-      timestamp: "8 minutes ago",
+      type: "success",
+      message: "Stream persists after browser close",
+      timestamp: "5 minutes ago",
     },
     {
       id: 3,
       type: "success",
-      message: "Video upload completed",
-      timestamp: "15 minutes ago",
+      message: "FFmpeg process running independently",
+      timestamp: "8 minutes ago",
     },
   ];
 

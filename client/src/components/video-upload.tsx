@@ -22,7 +22,19 @@ export default function VideoUpload() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("video", file);
-      const response = await apiRequest("POST", "/api/videos/upload", formData);
+          
+      // Use fetch directly for file uploads to avoid JSON serialization
+      const response = await fetch("/api/videos/upload", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Upload failed: ${errorText}`);
+      }
+      
       return response.json();
     },
     onSuccess: () => {

@@ -1,0 +1,509 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replit FFmpeg Facebook Live Streamer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        'primary': '#3B82F6',
+                        'secondary': '#6B7280',
+                        'success': '#10B981',
+                        'warning': '#F59E0B',
+                        'error': '#EF4444'
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <!-- @COMPONENT: Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-video text-white text-sm"></i>
+                    </div>
+                    <h1 class="text-xl font-semibold text-gray-900">FFmpeg Live Streamer</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 text-sm text-secondary">
+                        <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                        <span data-bind="connection.status">Connected to Replit</span>
+                    </div>
+                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- @COMPONENT: MainContent -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Video Upload Section -->
+                <!-- @COMPONENT: VideoUploadSection -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900">Video Management</h2>
+                        <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-folder-open mr-2"></i>
+                            Browse Files
+                        </button>
+                    </div>
+
+                    <!-- Upload Area -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary transition-colors cursor-pointer" data-implementation="Implement drag and drop file upload">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-lg font-medium text-gray-900 mb-2">Drag & drop videos here</p>
+                        <p class="text-sm text-secondary mb-4">Supports MP4, AVI, MOV formats (max 2GB)</p>
+                        <button class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Choose Files
+                        </button>
+                    </div>
+
+                    <!-- Uploaded Videos List -->
+                    <div class="mt-6">
+                        <h3 class="text-sm font-medium text-gray-900 mb-4">Uploaded Videos <span class="text-secondary">(3)</span></h3>
+                        
+                        <!-- @MAP: uploadedVideos.map(video => ( -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-play text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900" data-bind="video.name">marketing_video_final.mp4</p>
+                                        <p class="text-sm text-secondary"><span data-bind="video.duration">2:34</span> • <span data-bind="video.size">45.2 MB</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
+                                        Ready
+                                    </span>
+                                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" data-event="click:addToQueue">
+                                        <i class="fas fa-plus-circle"></i>
+                                    </button>
+                                    <button class="p-2 text-gray-400 hover:text-error transition-colors" data-event="click:deleteVideo">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-play text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900" data-bind="video.name">product_demo_v2.mp4</p>
+                                        <p class="text-sm text-secondary"><span data-bind="video.duration">5:12</span> • <span data-bind="video.size">124.8 MB</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-warning/10 text-warning">
+                                        Processing
+                                    </span>
+                                    <div class="w-4 h-4">
+                                        <div class="animate-spin w-4 h-4 border-2 border-warning border-t-transparent rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-play text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900" data-bind="video.name">webinar_recording.mov</p>
+                                        <p class="text-sm text-secondary"><span data-bind="video.duration">45:23</span> • <span data-bind="video.size">892.1 MB</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
+                                        Ready
+                                    </span>
+                                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" data-event="click:addToQueue">
+                                        <i class="fas fa-plus-circle"></i>
+                                    </button>
+                                    <button class="p-2 text-gray-400 hover:text-error transition-colors" data-event="click:deleteVideo">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: VideoUploadSection -->
+
+                <!-- Streaming Queue -->
+                <!-- @COMPONENT: StreamingQueue -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900">Streaming Queue</h2>
+                        <div class="flex items-center space-x-3">
+                            <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors" data-event="click:clearQueue">
+                                <i class="fas fa-trash mr-2"></i>
+                                Clear Queue
+                            </button>
+                            <button class="inline-flex items-center px-6 py-2 bg-success text-white rounded-lg font-medium hover:bg-green-600 transition-colors" data-event="click:startStreaming">
+                                <i class="fas fa-play mr-2"></i>
+                                Start Streaming
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Queue Items -->
+                    <!-- @STATE: queueItems:array = [] -->
+                    <div class="space-y-3">
+                        <!-- Currently Streaming -->
+                        <div class="p-4 bg-success/5 border border-success/20 rounded-lg" data-mock="true">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-video text-success"></i>
+                                        <div>
+                                            <p class="font-medium text-gray-900" data-bind="currentVideo.name">marketing_video_final.mp4</p>
+                                            <p class="text-sm text-secondary">Currently streaming • <span data-bind="currentVideo.elapsed">1:24</span> / <span data-bind="currentVideo.duration">2:34</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-sm text-secondary">
+                                        <span class="font-medium text-success" data-bind="streamMetrics.viewers">1,247</span> viewers
+                                    </div>
+                                    <button class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors" data-event="click:stopStreaming">
+                                        <i class="fas fa-stop"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-success h-2 rounded-full transition-all duration-300" style="width: 52%" data-bind="streamProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Queue Items -->
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200" data-mock="true">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
+                                        <span class="text-xs font-medium text-gray-600">1</span>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-video text-gray-400"></i>
+                                        <div>
+                                            <p class="font-medium text-gray-900" data-bind="queuedVideo.name">webinar_recording.mov</p>
+                                            <p class="text-sm text-secondary">Next in queue • <span data-bind="queuedVideo.duration">45:23</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" data-event="click:moveUp">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                    <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" data-event="click:moveDown">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                    <button class="p-2 text-gray-400 hover:text-error transition-colors" data-event="click:removeFromQueue">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div class="text-center py-8 text-gray-500" style="display: none;" data-show-when="queue.length === 0">
+                            <i class="fas fa-list-alt text-2xl mb-2"></i>
+                            <p>No videos in queue</p>
+                            <p class="text-sm">Add videos from your uploaded files</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: StreamingQueue -->
+
+                <!-- Stream Configuration -->
+                <!-- @COMPONENT: StreamConfiguration -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-6">Stream Configuration</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Video Quality</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" data-bind="config.quality">
+                                <option>1080p (High Quality)</option>
+                                <option>720p (Standard)</option>
+                                <option>480p (Mobile Friendly)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bitrate</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" data-bind="config.bitrate">
+                                <option>4000 kbps (Recommended)</option>
+                                <option>2500 kbps</option>
+                                <option>1800 kbps</option>
+                                <option>1200 kbps</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary" data-bind="config.autoQueue">
+                                <span class="text-sm font-medium text-gray-700">Automatically queue next video</span>
+                            </label>
+                            <p class="text-xs text-secondary mt-1">When enabled, videos will stream continuously without manual intervention</p>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary" data-bind="config.notifications">
+                                <span class="text-sm font-medium text-gray-700">Send notifications for stream events</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: StreamConfiguration -->
+
+            </div>
+            <!-- @END_COMPONENT: MainContent -->
+
+            <!-- @COMPONENT: Sidebar -->
+            <div class="space-y-6">
+                
+                <!-- Facebook Integration -->
+                <!-- @COMPONENT: FacebookIntegration -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Facebook Live</h3>
+                    
+                    <!-- Connection Status -->
+                    <div class="flex items-center justify-between p-3 bg-success/5 border border-success/20 rounded-lg mb-4" data-mock="true">
+                        <div class="flex items-center space-x-2">
+                            <i class="fab fa-facebook text-blue-600"></i>
+                            <span class="text-sm font-medium text-gray-900">Connected</span>
+                        </div>
+                        <div class="w-2 h-2 bg-success rounded-full"></div>
+                    </div>
+
+                    <!-- Page Selection -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Facebook Page</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm" data-bind="facebook.selectedPage">
+                            <option data-mock="true">Tech Company Official</option>
+                            <option data-mock="true">Marketing Department</option>
+                            <option data-mock="true">Product Updates</option>
+                        </select>
+                    </div>
+
+                    <!-- Stream Title -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Stream Title</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm" placeholder="Enter stream title..." data-bind="facebook.streamTitle" data-mock="true" value="Weekly Product Demo">
+                    </div>
+
+                    <!-- Stream Description -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm resize-none" placeholder="Optional description..." data-bind="facebook.streamDescription" data-mock="true">Join us for our weekly product demonstration and Q&A session!</textarea>
+                    </div>
+
+                    <!-- Credentials Management -->
+                    <button class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors" data-event="click:manageFacebookCredentials">
+                        <i class="fas fa-cog mr-2"></i>
+                        Manage Credentials
+                    </button>
+                </div>
+                <!-- @END_COMPONENT: FacebookIntegration -->
+
+                <!-- Stream Analytics -->
+                <!-- @COMPONENT: StreamAnalytics -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Stream Analytics</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">Current Viewers</span>
+                            <span class="text-lg font-semibold text-gray-900" data-bind="analytics.currentViewers" data-mock="true">1,247</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">Peak Viewers</span>
+                            <span class="text-lg font-semibold text-gray-900" data-bind="analytics.peakViewers" data-mock="true">1,892</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">Total Reach</span>
+                            <span class="text-lg font-semibold text-gray-900" data-bind="analytics.totalReach" data-mock="true">5,423</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">Engagement Rate</span>
+                            <span class="text-lg font-semibold text-gray-900" data-bind="analytics.engagementRate" data-mock="true">12.3%</span>
+                        </div>
+                        
+                        <hr class="border-gray-200">
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">Stream Duration</span>
+                            <span class="text-sm font-medium text-gray-900" data-bind="analytics.duration" data-mock="true">1h 24m</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-secondary">Data Usage</span>
+                            <span class="text-sm font-medium text-gray-900" data-bind="analytics.dataUsage" data-mock="true">2.8 GB</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: StreamAnalytics -->
+
+                <!-- System Status -->
+                <!-- @COMPONENT: SystemStatus -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-success rounded-full"></div>
+                                <span class="text-sm text-gray-700">FFmpeg Service</span>
+                            </div>
+                            <span class="text-xs text-success font-medium">Running</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-success rounded-full"></div>
+                                <span class="text-sm text-gray-700">Facebook API</span>
+                            </div>
+                            <span class="text-xs text-success font-medium">Connected</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-success rounded-full"></div>
+                                <span class="text-sm text-gray-700">Storage</span>
+                            </div>
+                            <span class="text-xs text-secondary">2.1 GB / 10 GB</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-warning rounded-full"></div>
+                                <span class="text-sm text-gray-700">Network</span>
+                            </div>
+                            <span class="text-xs text-warning font-medium">Moderate</span>
+                        </div>
+                    </div>
+
+                    <!-- Recent Errors -->
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <h4 class="text-sm font-medium text-gray-900 mb-3">Recent Activity</h4>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex items-start space-x-2" data-mock="true">
+                                <div class="w-1 h-1 bg-success rounded-full mt-1.5 flex-shrink-0"></div>
+                                <div>
+                                    <p class="text-gray-700">Stream started successfully</p>
+                                    <p class="text-secondary">2 minutes ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-2" data-mock="true">
+                                <div class="w-1 h-1 bg-warning rounded-full mt-1.5 flex-shrink-0"></div>
+                                <div>
+                                    <p class="text-gray-700">Network latency spike detected</p>
+                                    <p class="text-secondary">8 minutes ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-2" data-mock="true">
+                                <div class="w-1 h-1 bg-success rounded-full mt-1.5 flex-shrink-0"></div>
+                                <div>
+                                    <p class="text-gray-700">Video upload completed</p>
+                                    <p class="text-secondary">15 minutes ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: SystemStatus -->
+
+            </div>
+            <!-- @END_COMPONENT: Sidebar -->
+
+        </div>
+    </div>
+
+    <!-- @COMPONENT: NotificationToast -->
+    <div id="notification-toast" class="fixed bottom-4 right-4 max-w-sm bg-white rounded-lg shadow-lg border border-gray-200 p-4 transform translate-y-full transition-transform duration-300" style="display: none;" data-implementation="Show/hide notifications">
+        <div class="flex items-start space-x-3">
+            <div class="w-5 h-5 bg-success rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fas fa-check text-white text-xs"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900" data-bind="notification.title">Stream Started</p>
+                <p class="text-xs text-secondary mt-1" data-bind="notification.message">Your video is now streaming live to Facebook</p>
+            </div>
+            <button class="text-gray-400 hover:text-gray-600 ml-4" data-event="click:dismissNotification">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: NotificationToast -->
+
+    <script>
+        // TODO: Implement FFmpeg integration, Facebook Graph API calls, file upload handling, streaming controls, real-time status updates, and error handling
+        (function() {
+            // Demo interactions for the mockup
+            const streamButton = document.querySelector('[data-event="click:startStreaming"]');
+            const uploadArea = document.querySelector('.border-dashed');
+            
+            if (streamButton) {
+                streamButton.addEventListener('click', function() {
+                    // TODO: Implement actual streaming logic with FFmpeg
+                    console.log('Stream button clicked - implement actual streaming');
+                });
+            }
+            
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('border-primary', 'bg-primary/5');
+                });
+                
+                uploadArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('border-primary', 'bg-primary/5');
+                });
+                
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('border-primary', 'bg-primary/5');
+                    // TODO: Implement actual file upload handling
+                    console.log('Files dropped - implement actual upload logic');
+                });
+            }
+        })();
+    </script>
+
+</body>
+</html>
